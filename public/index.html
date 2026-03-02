@@ -20,8 +20,9 @@
         }
 
         .container {
-            max-width: 1800px;
+            max-width: 100%;
             margin: 0 auto;
+            padding: 0 20px;
         }
 
         header {
@@ -97,94 +98,84 @@
             cursor: pointer;
         }
 
-        .price-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .price-card {
+        .table-container {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
             padding: 20px;
             backdrop-filter: blur(10px);
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            overflow-x: auto;
         }
 
-        .price-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        thead {
+            background: rgba(255, 255, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .symbol {
-            font-size: 1.8em;
+        th {
+            padding: 15px 10px;
+            text-align: center;
             font-weight: bold;
-            color: #F0B90B;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
         }
 
-        .binance-price {
-            font-size: 1.3em;
-            color: #F0B90B;
-            font-weight: bold;
+        th.symbol-col {
+            width: 80px;
         }
 
-        .exchange-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        th.exchange-col {
+            min-width: 180px;
         }
 
-        .exchange-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+        tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             transition: background 0.3s;
         }
 
-        .exchange-item:hover {
+        tbody tr:hover {
             background: rgba(255, 255, 255, 0.1);
         }
 
-        .exchange-name {
-            font-weight: bold;
-            font-size: 1em;
+        td {
+            padding: 12px 10px;
+            text-align: center;
         }
 
-        .exchange-price {
-            font-size: 1em;
+        .symbol {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #F0B90B;
+        }
+
+        .price-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .price-value {
             font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1em;
         }
 
         .price-diff {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 2px;
-        }
-
-        .diff-amount {
-            font-size: 0.9em;
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
-        }
-
-        .diff-percent {
             font-size: 0.85em;
             font-family: 'Courier New', monospace;
+        }
+
+        .binance-price {
+            color: #F0B90B;
+            font-weight: bold;
         }
 
         .positive {
@@ -211,17 +202,49 @@
             font-size: 0.9em;
         }
 
-        @media (max-width: 768px) {
-            .price-grid {
-                grid-template-columns: 1fr;
+        .exchange-header {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .exchange-name {
+            font-weight: bold;
+        }
+
+        @media (max-width: 1400px) {
+            .container {
+                padding: 0 10px;
             }
 
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px 5px;
+            }
+
+            .price-diff {
+                font-size: 0.75em;
+            }
+        }
+
+        @media (max-width: 768px) {
             h1 {
                 font-size: 1.8em;
             }
 
             .search-box {
                 width: 100%;
+            }
+
+            table {
+                font-size: 11px;
+            }
+
+            th, td {
+                padding: 6px 3px;
             }
         }
     </style>
@@ -246,8 +269,49 @@
             </select>
         </div>
 
-        <div class="price-grid" id="priceGrid">
-            <div class="loading">正在加载数据...</div>
+        <div class="table-container">
+            <table id="priceTable">
+                <thead>
+                    <tr>
+                        <th class="symbol-col">币种</th>
+                        <th class="exchange-col">
+                            <div class="exchange-header">
+                                <span class="exchange-name">币安</span>
+                                <span style="font-size: 0.8em; opacity: 0.8;">(基准)</span>
+                            </div>
+                        </th>
+                        <th class="exchange-col">
+                            <div class="exchange-header">
+                                <span class="exchange-name">OKX</span>
+                                <span style="font-size: 0.8em; opacity: 0.8;">差异</span>
+                            </div>
+                        </th>
+                        <th class="exchange-col">
+                            <div class="exchange-header">
+                                <span class="exchange-name">火币</span>
+                                <span style="font-size: 0.8em; opacity: 0.8;">差异</span>
+                            </div>
+                        </th>
+                        <th class="exchange-col">
+                            <div class="exchange-header">
+                                <span class="exchange-name">Gate.io</span>
+                                <span style="font-size: 0.8em; opacity: 0.8;">差异</span>
+                            </div>
+                        </th>
+                        <th class="exchange-col">
+                            <div class="exchange-header">
+                                <span class="exchange-name">KuCoin</span>
+                                <span style="font-size: 0.8em; opacity: 0.8;">差异</span>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="priceTableBody">
+                    <tr>
+                        <td colspan="6" class="loading">正在加载数据...</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -317,9 +381,9 @@
             };
         }
 
-        // 渲染价格卡片
+        // 渲染价格表格
         function renderPrices() {
-            const grid = document.getElementById('priceGrid');
+            const tbody = document.getElementById('priceTableBody');
 
             // 转换为数组并过滤
             let dataArray = Object.values(priceData);
@@ -346,39 +410,53 @@
             });
 
             if (dataArray.length === 0) {
-                grid.innerHTML = '<div class="loading">没有找到匹配的币种</div>';
+                tbody.innerHTML = '<tr><td colspan="6" class="loading">没有找到匹配的币种</td></tr>';
                 return;
             }
 
-            grid.innerHTML = dataArray.map(data => {
-                const exchangeItems = Object.entries(data.exchanges).map(([id, exchange]) => {
+            tbody.innerHTML = dataArray.map(data => {
+                // 币安价格列
+                const binanceCell = `
+                    <td>
+                        <div class="price-cell">
+                            <span class="price-value binance-price">$${formatPrice(data.binancePrice)}</span>
+                        </div>
+                    </td>
+                `;
+
+                // 其他交易所列
+                const exchanges = ['okx', 'huobi', 'gate', 'kucoin'];
+                const exchangeCells = exchanges.map(exchangeId => {
+                    const exchange = data.exchanges[exchangeId];
+                    if (!exchange) {
+                        return `
+                            <td>
+                                <div class="price-cell">
+                                    <span class="no-data">--</span>
+                                </div>
+                            </td>
+                        `;
+                    }
+
                     const diffFormatted = formatDiff(exchange.diff, exchange.diffPercent);
                     const diffClass = exchange.diff > 0 ? 'positive' : (exchange.diff < 0 ? 'negative' : 'neutral');
 
                     return `
-                        <div class="exchange-item">
-                            <span class="exchange-name" style="color: ${exchange.color}">${exchange.name}</span>
-                            <div class="exchange-price">
-                                <span>$${formatPrice(exchange.price)}</span>
+                        <td>
+                            <div class="price-cell">
+                                <span class="price-value">$${formatPrice(exchange.price)}</span>
+                                <span class="price-diff ${diffClass}">${diffFormatted.percent}</span>
                             </div>
-                            <div class="price-diff">
-                                <span class="diff-amount ${diffClass}">${diffFormatted.amount}</span>
-                                <span class="diff-percent ${diffClass}">${diffFormatted.percent}</span>
-                            </div>
-                        </div>
+                        </td>
                     `;
                 }).join('');
 
                 return `
-                    <div class="price-card">
-                        <div class="card-header">
-                            <span class="symbol">${data.symbol}</span>
-                            <span class="binance-price">币安: $${formatPrice(data.binancePrice)}</span>
-                        </div>
-                        <div class="exchange-list">
-                            ${exchangeItems || '<div class="no-data">暂无其他交易所数据</div>'}
-                        </div>
-                    </div>
+                    <tr>
+                        <td><span class="symbol">${data.symbol}</span></td>
+                        ${binanceCell}
+                        ${exchangeCells}
+                    </tr>
                 `;
             }).join('');
         }
